@@ -25,7 +25,22 @@ When a check fails, Outcome Guard throws a real n8n error — which means it plu
 
 ## Status
 
-Early prototype. Core logic implemented and type-checked. Not yet published to the n8n community node registry.
+Working prototype: compiles clean, passes n8n's own community-node linter, 5/5 test scenarios pass, and verified live against a running n8n instance. Not yet submitted to the official n8n community node registry — see "Try it right now" below for testing before that.
+
+## Try it right now (no GitHub or npm account needed)
+
+If someone sent you a `n8n-nodes-outcome-guard-0.1.0.tgz` file, you can try this node in your own n8n today:
+
+```bash
+mkdir -p ~/.n8n/custom
+cd ~/.n8n/custom
+npm init -y          # skip if this file already exists
+npm install /path/to/n8n-nodes-outcome-guard-0.1.0.tgz
+```
+
+Restart n8n. Search for **"Outcome Guard"** when adding a node — it'll be there.
+
+Found something confusing, a bug, or a check type you wish existed? That feedback is exactly what this early stage needs — say so.
 
 ## Local development
 
