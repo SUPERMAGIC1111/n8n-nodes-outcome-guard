@@ -1,18 +1,10 @@
 # Publishing checklist
 
-Everything code-side is done and verified (see CHANGELOG.md). What's left needs your own GitHub and npm accounts — I can't create accounts or log in on your behalf, so these are the exact steps for whenever you're ready. Nothing here needs guesswork; just follow in order.
+Everything code-side is done and verified (see CHANGELOG.md). What's left needs your own npm account — I can't log in on your behalf, so these are the exact steps for whenever you're ready.
 
-## 1. Create the GitHub repo
+## 1. GitHub repo — done ✅
 
-1. Go to github.com → New repository → name it `n8n-nodes-outcome-guard` → Public → **don't** initialize with a README (we already have one)
-2. Copy the repo URL it gives you (looks like `https://github.com/<you>/n8n-nodes-outcome-guard.git`)
-3. Run:
-   ```bash
-   cd ~/Documents/AIAIAI-----AI/n8n-outcome-guard
-   git remote add origin <paste-the-URL-here>
-   git push -u origin main
-   ```
-4. Update `package.json`'s `"repository"` and `"homepage"` fields with the real URL (currently left blank on purpose — see the commit history, we didn't want to fake a link that didn't exist yet)
+Live at https://github.com/SUPERMAGIC1111/n8n-nodes-outcome-guard — full history, MIT license detected, `package.json` updated with the real URL. Pushed via a dedicated SSH deploy key (`outcome-guard-deploy` in your GitHub SSH keys settings) so future pushes need no password/token at all.
 
 ## 2. Create an npm account (if you don't have one)
 

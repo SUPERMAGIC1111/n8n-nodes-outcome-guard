@@ -6,13 +6,16 @@
     "n8n-community-node-package"
   ],
   "license": "MIT",
-  "homepage": "",
+  "homepage": "https://github.com/SUPERMAGIC1111/n8n-nodes-outcome-guard#readme",
   "author": {
     "name": "Campell"
   },
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "git+https://github.com/SUPERMAGIC1111/n8n-nodes-outcome-guard.git"
+  },
+  "bugs": {
+    "url": "https://github.com/SUPERMAGIC1111/n8n-nodes-outcome-guard/issues"
   },
   "main": "index.js",
   "scripts": {
