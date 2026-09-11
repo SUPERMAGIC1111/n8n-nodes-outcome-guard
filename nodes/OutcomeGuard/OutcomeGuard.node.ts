@@ -18,6 +18,19 @@ function getByPath(obj: unknown, path: string): unknown {
 		}, obj);
 }
 
+// Trims incidental whitespace either side always (an API returning "confirmed "
+// shouldn't fail a check nobody meant to be whitespace-sensitive), and optionally
+// ignores case for values like "Confirmed" vs "confirmed".
+function looseEquals(actual: unknown, expected: unknown, caseInsensitive: boolean): boolean {
+	let a = String(actual).trim();
+	let b = String(expected).trim();
+	if (caseInsensitive) {
+		a = a.toLowerCase();
+		b = b.toLowerCase();
+	}
+	return a === b;
+}
+
 export class OutcomeGuard implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Outcome Guard',
@@ -155,6 +168,19 @@ export class OutcomeGuard implements INodeType {
 				},
 			},
 			{
+				displayName: 'Case Insensitive',
+				name: 'caseInsensitive',
+				type: 'boolean',
+				default: false,
+				description:
+					'Whether "Confirmed" and "confirmed" count as equal. Leading/trailing whitespace is always ignored.',
+				displayOptions: {
+					show: {
+						checkType: ['fieldEquals', 'httpRecheck'],
+					},
+				},
+			},
+			{
 				displayName: 'On Failure',
 				name: 'onFailure',
 				type: 'options',
@@ -193,7 +219,8 @@ export class OutcomeGuard implements INodeType {
 				} else if (checkType === 'fieldEquals') {
 					const value = this.getNodeParameter('fieldValue', i);
 					const expected = this.getNodeParameter('expectedValue', i) as string;
-					passed = String(value) === String(expected);
+					const caseInsensitive = this.getNodeParameter('caseInsensitive', i) as boolean;
+					passed = looseEquals(value, expected, caseInsensitive);
 					reason = `Expected field to equal "${expected}", got: ${JSON.stringify(value)}`;
 				} else if (checkType === 'noErrorKeyword') {
 					const body = this.getNodeParameter('responseBody', i) as string;
@@ -230,8 +257,9 @@ export class OutcomeGuard implements INodeType {
 						json: true,
 					});
 
+					const caseInsensitive = this.getNodeParameter('caseInsensitive', i) as boolean;
 					const actual = getByPath(response, expectedFieldPath);
-					passed = String(actual) === String(expectedFieldValue);
+					passed = looseEquals(actual, expectedFieldValue, caseInsensitive);
 					reason = `Re-checked ${verifyUrl} — expected "${expectedFieldPath}" to equal "${expectedFieldValue}", got: ${JSON.stringify(
 						actual,
 					)}`;

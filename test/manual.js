@@ -106,4 +106,43 @@ async function run(name, items, params) {
 			if (name === 'onFailure') return 'throw';
 		},
 	);
+
+	// 8. Different casing with caseInsensitive=false (default) -> must THROW
+	await run(
+		'"Confirmed" vs "confirmed", case-sensitive (default) -> should fail',
+		[{ json: { status: 'Confirmed' } }],
+		(name) => {
+			if (name === 'checkType') return 'fieldEquals';
+			if (name === 'fieldValue') return 'Confirmed';
+			if (name === 'expectedValue') return 'confirmed';
+			if (name === 'caseInsensitive') return false;
+			if (name === 'onFailure') return 'throw';
+		},
+	);
+
+	// 9. Same casing mismatch, but caseInsensitive=true -> must PASS
+	await run(
+		'"Confirmed" vs "confirmed", case-insensitive -> should pass',
+		[{ json: { status: 'Confirmed' } }],
+		(name) => {
+			if (name === 'checkType') return 'fieldEquals';
+			if (name === 'fieldValue') return 'Confirmed';
+			if (name === 'expectedValue') return 'confirmed';
+			if (name === 'caseInsensitive') return true;
+			if (name === 'onFailure') return 'throw';
+		},
+	);
+
+	// 10. Incidental whitespace from a sloppy API -> must PASS even without caseInsensitive
+	await run(
+		'"confirmed " with trailing space -> should pass (whitespace always trimmed)',
+		[{ json: { status: 'confirmed ' } }],
+		(name) => {
+			if (name === 'checkType') return 'fieldEquals';
+			if (name === 'fieldValue') return 'confirmed ';
+			if (name === 'expectedValue') return 'confirmed';
+			if (name === 'caseInsensitive') return false;
+			if (name === 'onFailure') return 'throw';
+		},
+	);
 })();
