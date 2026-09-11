@@ -1,0 +1,452 @@
+<title>Outcome Guard</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+
+  :root {
+    --paper: #F1F4F3;
+    --surface: #FFFFFF;
+    --ink: #12191C;
+    --ink-soft: #4B5B5F;
+    --line: #D7E0DD;
+    --signal: #0B7C87;
+    --signal-soft: #E2F1F1;
+    --ok: #1F8F63;
+    --ok-soft: #E3F5EC;
+    --warn: #B8791A;
+    --warn-soft: #FBF0DC;
+    --crit: #C43B3B;
+    --crit-soft: #FBE7E5;
+    --code-bg: #10181B;
+    --code-ink: #DCEAE7;
+    --code-line: #26343730;
+    --shadow: 0 1px 2px rgba(18,25,28,0.04), 0 8px 24px rgba(18,25,28,0.06);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #0F1619;
+      --surface: #16201F;
+      --ink: #E9F1EF;
+      --ink-soft: #9DB0AC;
+      --line: #26363A;
+      --signal: #4FD3D9;
+      --signal-soft: #163338;
+      --ok: #55D19A;
+      --ok-soft: #123526;
+      --warn: #F0B84D;
+      --warn-soft: #3A2C13;
+      --crit: #F1786D;
+      --crit-soft: #3B1B1B;
+      --code-bg: #0A1113;
+      --code-ink: #D7E7E3;
+      --code-line: #ffffff14;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 28px rgba(0,0,0,0.45);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --paper: #0F1619;
+    --surface: #16201F;
+    --ink: #E9F1EF;
+    --ink-soft: #9DB0AC;
+    --line: #26363A;
+    --signal: #4FD3D9;
+    --signal-soft: #163338;
+    --ok: #55D19A;
+    --ok-soft: #123526;
+    --warn: #F0B84D;
+    --warn-soft: #3A2C13;
+    --crit: #F1786D;
+    --crit-soft: #3B1B1B;
+    --code-bg: #0A1113;
+    --code-ink: #D7E7E3;
+    --code-line: #ffffff14;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 28px rgba(0,0,0,0.45);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+    line-height: 1.55;
+  }
+
+  .wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 80px;
+  }
+
+  .eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11.5px;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--signal);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .eyebrow::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    background: var(--signal);
+    border-radius: 1px;
+    flex-shrink: 0;
+  }
+
+  h1, h2 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 700;
+    text-wrap: balance;
+    margin: 0;
+    color: var(--ink);
+  }
+
+  h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.18; letter-spacing: -0.01em; }
+  h2 { font-size: 21px; line-height: 1.3; margin-bottom: 18px; }
+
+  p { margin: 0; color: var(--ink-soft); max-width: 62ch; }
+  strong { color: var(--ink); font-weight: 600; }
+
+  section { padding: 52px 0; border-top: 1px solid var(--line); }
+  section:first-of-type { border-top: none; padding-top: 0; }
+
+  /* ---------- HERO ---------- */
+  .hero-sub { margin-top: 16px; font-size: 16.5px; }
+
+  .scope {
+    margin-top: 36px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    padding: 22px 22px 16px;
+  }
+  .scope-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    margin-bottom: 10px;
+  }
+  .scope-head .tag {
+    color: var(--ok);
+    font-weight: 600;
+  }
+  svg.wave { display: block; width: 100%; height: auto; }
+  .wave-caption {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-soft);
+    margin-top: 8px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--line);
+  }
+  .wave-caption .crit-label { color: var(--crit); font-weight: 600; }
+
+  .cta-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 28px;
+    flex-wrap: wrap;
+  }
+  .cta-row a {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    padding: 11px 18px;
+    border-radius: 7px;
+    transition: opacity 0.15s ease;
+  }
+  .cta-row a:hover { opacity: 0.82; }
+  .cta-row a:focus-visible { outline: 2px solid var(--signal); outline-offset: 2px; }
+  .cta-primary { background: var(--signal); color: #06171A; }
+  .cta-secondary { background: var(--surface); color: var(--ink); border: 1px solid var(--line); }
+
+  /* ---------- EVIDENCE ---------- */
+  .log { display: flex; flex-direction: column; }
+  .log-entry {
+    display: grid;
+    grid-template-columns: 108px 1fr;
+    gap: 18px;
+    padding: 16px 0;
+    border-top: 1px solid var(--line);
+  }
+  .log-entry:first-child { border-top: none; padding-top: 0; }
+  .log-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-soft);
+    padding-top: 2px;
+  }
+  .log-entry p { max-width: 54ch; color: var(--ink); }
+
+  /* ---------- PROOF ---------- */
+  .terminal {
+    background: var(--code-bg);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .terminal-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--code-line);
+  }
+  .terminal-bar span {
+    width: 9px; height: 9px; border-radius: 50%;
+    background: var(--code-line);
+    flex-shrink: 0;
+  }
+  .terminal-bar .label {
+    margin-left: 8px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: #7C918D;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+  .terminal-body { padding: 18px 20px 22px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; overflow-x: auto; }
+  .terminal-body .line { color: #7C918D; margin-bottom: 4px; }
+  .terminal-body .payload { color: var(--code-ink); margin: 4px 0 16px; white-space: pre; }
+  .terminal-body .thrown { color: #F1786D; white-space: pre-wrap; }
+  .terminal-body .caught-label { color: #F1786D; font-weight: 600; }
+
+  .proof-note { margin-top: 14px; font-size: 13.5px; }
+
+  /* ---------- CHECK TYPES ---------- */
+  .checks {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .check {
+    background: var(--surface);
+    padding: 18px 20px;
+  }
+  .check-name {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--signal);
+    margin-bottom: 6px;
+  }
+  .check p { font-size: 13.5px; }
+
+  /* ---------- CODE ---------- */
+  pre.code {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.65;
+    padding: 20px;
+    border-radius: 10px;
+    overflow-x: auto;
+    box-shadow: var(--shadow);
+  }
+  .code-kw { color: #4FD3D9; }
+  .code-str { color: #F0B84D; }
+  .code-com { color: #7C918D; }
+
+  /* ---------- STATUS ---------- */
+  .status-list { display: flex; flex-direction: column; gap: 0; }
+  .status-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 0;
+    border-top: 1px solid var(--line);
+  }
+  .status-row:first-child { border-top: none; }
+  .pill {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 5px;
+    flex-shrink: 0;
+    width: 66px;
+    text-align: center;
+  }
+  .pill-ok { background: var(--ok-soft); color: var(--ok); }
+  .pill-pending { background: var(--warn-soft); color: var(--warn); }
+  .status-row span.desc { font-size: 14px; color: var(--ink); }
+
+  footer {
+    margin-top: 56px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  @media (max-width: 560px) {
+    .checks { grid-template-columns: 1fr; }
+    .log-entry { grid-template-columns: 1fr; gap: 4px; }
+    .wrap { padding: 40px 18px 60px; }
+  }
+</style>
+
+<div class="wrap">
+
+  <section>
+    <div class="eyebrow">Status report — Outcome Guard</div>
+    <h1>The checkmark was green.<br>The refund never happened.</h1>
+    <p class="hero-sub">
+      An n8n community node that catches the failures your automation doesn't know it had —
+      when a step reports success but the real-world outcome never occurred.
+    </p>
+
+    <div class="scope">
+      <div class="scope-head">
+        <span>WORKFLOW_EXECUTION.LOG</span>
+        <span class="tag">● STATUS: SUCCESS</span>
+      </div>
+      <svg class="wave" viewBox="0 0 680 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A calm flat success line with one hidden failure spike beneath the surface, marked in red.">
+        <line x1="0" y1="60" x2="680" y2="60" stroke="var(--line)" stroke-width="1" stroke-dasharray="2 4"/>
+        <path d="M0,60 L220,60 L232,60 L240,100 L248,30 L256,60 L268,60 L680,60"
+              fill="none" stroke="var(--crit)" stroke-width="2" opacity="0.9"/>
+        <path d="M0,60 L680,60" fill="none" stroke="var(--ok)" stroke-width="3"/>
+        <circle cx="244" cy="60" r="4" fill="var(--crit)"/>
+      </svg>
+      <div class="wave-caption">
+        <span>n8n's own log: flat line, no error thrown</span>
+        <span class="crit-label">what actually happened: hidden underneath ↑</span>
+      </div>
+    </div>
+
+    <div class="cta-row">
+      <a href="#proof" class="cta-primary">See it catch a real failure ↓</a>
+      <a href="#code" class="cta-secondary">View the node's code ↓</a>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">Why this exists</div>
+    <h2>This isn't a hunch — five independent findings led here</h2>
+    <div class="log">
+      <div class="log-entry">
+        <div class="log-tag">n=6,000+</div>
+        <p>An analysis of over 6,000 real n8n workflows named <strong>silent mid-workflow failures</strong> as a recurring pattern: the run stops or misbehaves while still reporting success.</p>
+      </div>
+      <div class="log-entry">
+        <div class="log-tag">n8n forum</div>
+        <p>Open community threads describe <strong>Cloudflare HTTP 520</strong> interrupting workflows mid-run — an external dependency breaking in a way n8n's own error handling doesn't catch.</p>
+      </div>
+      <div class="log-entry">
+        <div class="log-tag">Zapier</div>
+        <p>The identical disease is documented independently for Zapier, described as <strong>"a green checkmark that ran perfectly and did exactly the wrong thing"</strong> — this spans the category, not one tool.</p>
+      </div>
+      <div class="log-entry">
+        <div class="log-tag">NotiLens</div>
+        <p>A small existing product already monetizes "know when your Zaps break silently" for Zapier specifically — proof people pay for this. <strong>n8n's equivalent is still open.</strong></p>
+      </div>
+      <div class="log-entry">
+        <div class="log-tag">15 SEP 26</div>
+        <p>Cloudflare tightens default rules to block "Agent" category bots — external-dependency breakage for automations gets <strong>more common, not less</strong>, starting this week.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="proof">
+    <div class="eyebrow">Live, not staged</div>
+    <h2>Captured from a running n8n instance, today</h2>
+    <div class="terminal">
+      <div class="terminal-bar"><span></span><span></span><span></span><span class="label">outcome-guard.node.ts</span></div>
+      <div class="terminal-body">
+        <div class="line">// upstream API responded HTTP 200 with:</div>
+        <div class="payload">{"success": false, "message": "insufficient funds"}</div>
+        <div class="line"><span class="caught-label">✕ Problem in node 'Outcome Guard'</span></div>
+        <div class="thrown">Outcome Guard caught a silent failure: Response looked
+successful but contains a hidden failure indicator: "success":false</div>
+      </div>
+    </div>
+    <p class="proof-note">No mock, no staged screenshot — this is the exact error n8n rendered when Outcome Guard was tested against a "successful" response hiding a real failure. Thrown as a normal n8n error, so it reaches whatever alerting you already have.</p>
+  </section>
+
+  <section>
+    <div class="eyebrow">Four ways to check</div>
+    <h2>Verify the outcome, not just the absence of an error</h2>
+    <div class="checks">
+      <div class="check">
+        <div class="check-name">Field Exists</div>
+        <p>Fails if an expected field is missing, null, or blank.</p>
+      </div>
+      <div class="check">
+        <div class="check-name">Field Equals</div>
+        <p>Fails if a field doesn't match the value you expected.</p>
+      </div>
+      <div class="check">
+        <div class="check-name">Hidden Error Scan</div>
+        <p>Scans a response body for failure indicators, even under an HTTP 200.</p>
+      </div>
+      <div class="check">
+        <div class="check-name">Independent Re-Check</div>
+        <p>Calls a second API afterward to confirm the record actually exists.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="code">
+    <div class="eyebrow">The node itself</div>
+    <h2>Real TypeScript, compiled and verified</h2>
+    <pre class="code">    if (checkType === <span class="code-str">'noErrorKeyword'</span>) {
+      <span class="code-com">// e.g. an API returns HTTP 200 with an error hidden in the body</span>
+      <span class="code-kw">const</span> bodyNormalized = normalize(body);
+      <span class="code-kw">const</span> found = keywords.find(k =&gt; bodyNormalized.includes(k));
+      passed = !found;
+    }
+
+    <span class="code-kw">if</span> (!passed) {
+      <span class="code-kw">throw new</span> NodeOperationError(
+        this.getNode(),
+        <span class="code-str">`Outcome Guard caught a silent failure: ${reason}`</span>
+      );
+    }</pre>
+  </section>
+
+  <section>
+    <div class="eyebrow">Where this stands</div>
+    <h2>Built this week, checked at every step</h2>
+    <div class="status-list">
+      <div class="status-row"><span class="pill pill-ok">Done</span><span class="desc">TypeScript compiles clean against the live n8n-workflow package</span></div>
+      <div class="status-row"><span class="pill pill-ok">Done</span><span class="desc">5 of 5 test scenarios pass — including a real bug caught and fixed mid-build</span></div>
+      <div class="status-row"><span class="pill pill-ok">Done</span><span class="desc">Verified live inside a running local n8n instance, not just unit tests</span></div>
+      <div class="status-row"><span class="pill pill-pending">Next</span><span class="desc">Get it in front of 5–10 real n8n users before publishing further</span></div>
+      <div class="status-row"><span class="pill pill-pending">Next</span><span class="desc">Submit to the n8n community node marketplace for verification</span></div>
+    </div>
+  </section>
+
+  <footer>
+    <span>OUTCOME-GUARD // n8n-nodes-outcome-guard</span>
+    <span>Prototype — built with Claude</span>
+  </footer>
+
+</div>
