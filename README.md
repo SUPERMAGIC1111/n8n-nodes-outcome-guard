@@ -19,7 +19,7 @@ Drop **Outcome Guard** in after any step you don't fully trust. Tell it what "ac
 - **Field Exists / Not Empty** — fail if an expected field is missing or blank
 - **Field Equals** — fail if a field doesn't match what you expected
 - **Response Has Hidden Error** — scan a response body for error keywords even when the HTTP status looked fine
-- **Re-Fetch URL and Check Field** — independently call an API afterwards to confirm the record/result actually exists
+- **Re-Fetch URL and Check Field** — independently call an API afterwards to confirm the record/result actually exists (supports custom headers, so an authenticated API works too — e.g. `Authorization: Bearer ...`)
 
 When a check fails, Outcome Guard throws a real n8n error — which means it plugs straight into your existing Error Workflow / Slack / PagerDuty alerting. No new dashboard to learn.
 
@@ -41,6 +41,7 @@ Your workflow calls an API to create a contact, but that API is known to occasio
 
 - Check Type: `Re-Fetch URL and Check Field`
 - Verification URL: `={{ "https://api.example.com/contacts/" + $json.id }}`
+- Headers: `Authorization` → `={{ "Bearer " + $json.accessToken }}` (most real APIs need this — the re-check request supports headers just like the original call would)
 - Expected Field Path: `status`
 - Expected Field Value: `active`
 

@@ -1,20 +1,26 @@
 const { OutcomeGuard } = require('../dist/nodes/OutcomeGuard/OutcomeGuard.node.js');
 
-function makeContext(items, params) {
+function makeContext(items, params, httpRequestMock) {
 	return {
 		getInputData: () => items,
-		getNodeParameter: (name, i) => params(name, i),
+		// Mirrors real n8n behavior: an explicit default (3rd arg) is used when
+		// the test doesn't care about that parameter, instead of silently
+		// returning undefined and breaking anything that expects an array/object.
+		getNodeParameter: (name, i, defaultValue) => {
+			const value = params(name, i);
+			return value === undefined ? defaultValue : value;
+		},
 		getNode: () => ({ name: 'Outcome Guard' }),
 		helpers: {
-			httpRequest: async () => ({ data: { status: 'confirmed' } }),
+			httpRequest: httpRequestMock || (async () => ({ data: { status: 'confirmed' } })),
 		},
 	};
 }
 
-async function run(name, items, params) {
+async function run(name, items, params, httpRequestMock) {
 	const node = new OutcomeGuard();
 	try {
-		const result = await node.execute.call(makeContext(items, params));
+		const result = await node.execute.call(makeContext(items, params, httpRequestMock));
 		console.log(`[PASS-THROUGH] ${name}:`, JSON.stringify(result[0][0].json.outcomeGuard));
 	} catch (err) {
 		console.log(`[THROWN ERROR]  ${name}:`, err.message);
@@ -144,5 +150,30 @@ async function run(name, items, params) {
 			if (name === 'caseInsensitive') return false;
 			if (name === 'onFailure') return 'throw';
 		},
+	);
+
+	// 11. Headers must actually reach the verification HTTP request (e.g. Authorization: Bearer ...)
+	let capturedRequest = null;
+	await run(
+		'Custom headers are sent with the re-check request',
+		[{ json: { id: 42 } }],
+		(name) => {
+			if (name === 'checkType') return 'httpRecheck';
+			if (name === 'verifyUrl') return 'https://api.example.com/records/42';
+			if (name === 'headers.header') return [{ name: 'Authorization', value: 'Bearer secret-token' }];
+			if (name === 'expectedFieldPath') return 'data.status';
+			if (name === 'expectedFieldValue') return 'confirmed';
+			if (name === 'onFailure') return 'throw';
+		},
+		async (options) => {
+			capturedRequest = options;
+			return { data: { status: 'confirmed' } };
+		},
+	);
+	const gotAuthHeader = capturedRequest && capturedRequest.headers && capturedRequest.headers.Authorization;
+	console.log(
+		gotAuthHeader === 'Bearer secret-token'
+			? '[PASS]          Authorization header reached the HTTP request as expected'
+			: `[FAIL]          Authorization header missing or wrong: ${JSON.stringify(capturedRequest)}`,
 	);
 })();

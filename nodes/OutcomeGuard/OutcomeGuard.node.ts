@@ -143,6 +143,45 @@ export class OutcomeGuard implements INodeType {
 				},
 			},
 			{
+				displayName: 'Headers',
+				name: 'headers',
+				type: 'fixedCollection',
+				typeOptions: {
+					multipleValues: true,
+				},
+				default: {},
+				placeholder: 'Add Header',
+				description:
+					'Headers to send with the verification request — e.g. an Authorization Bearer token, if the API needs one',
+				displayOptions: {
+					show: {
+						checkType: ['httpRecheck'],
+					},
+				},
+				options: [
+					{
+						name: 'header',
+						displayName: 'Header',
+						values: [
+							{
+								displayName: 'Name',
+								name: 'name',
+								type: 'string',
+								default: '',
+								placeholder: 'Authorization',
+							},
+							{
+								displayName: 'Value',
+								name: 'value',
+								type: 'string',
+								default: '',
+								placeholder: '={{ "Bearer " + $json.accessToken }}',
+							},
+						],
+					},
+				],
+			},
+			{
 				displayName: 'Expected Field Path',
 				name: 'expectedFieldPath',
 				type: 'string',
@@ -250,10 +289,18 @@ export class OutcomeGuard implements INodeType {
 					const verifyUrl = this.getNodeParameter('verifyUrl', i) as string;
 					const expectedFieldPath = this.getNodeParameter('expectedFieldPath', i) as string;
 					const expectedFieldValue = this.getNodeParameter('expectedFieldValue', i) as string;
+					const headerEntries = this.getNodeParameter('headers.header', i, []) as Array<{
+						name: string;
+						value: string;
+					}>;
+					const headers = Object.fromEntries(
+						headerEntries.filter((h) => h.name).map((h) => [h.name, h.value]),
+					);
 
 					const response = await this.helpers.httpRequest({
 						method: 'GET',
 						url: verifyUrl,
+						headers,
 						json: true,
 					});
 
