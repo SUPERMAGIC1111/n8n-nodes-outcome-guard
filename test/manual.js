@@ -82,4 +82,28 @@ async function run(name, items, params) {
 			if (name === 'onFailure') return 'tag';
 		},
 	);
+
+	// 6. A harmless field name containing "error" as a substring -> must PASS, not false-positive
+	await run(
+		'Harmless "errorCount": 0 field must not false-positive',
+		[{ json: {} }],
+		(name) => {
+			if (name === 'checkType') return 'noErrorKeyword';
+			if (name === 'responseBody') return '{"errorCount": 0, "data": "ok"}';
+			if (name === 'errorKeywords') return 'error,failed,exception';
+			if (name === 'onFailure') return 'throw';
+		},
+	);
+
+	// 7. A genuine whole-word "failed" -> must still THROW (word-boundary fix must not break true positives)
+	await run(
+		'Genuine whole-word "failed" must still be caught',
+		[{ json: {} }],
+		(name) => {
+			if (name === 'checkType') return 'noErrorKeyword';
+			if (name === 'responseBody') return '{"status": "failed"}';
+			if (name === 'errorKeywords') return 'error,failed,exception';
+			if (name === 'onFailure') return 'throw';
+		},
+	);
 })();

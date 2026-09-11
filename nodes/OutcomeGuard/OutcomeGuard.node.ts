@@ -204,7 +204,17 @@ export class OutcomeGuard implements INodeType {
 						.split(',')
 						.map((k) => k.trim())
 						.filter(Boolean);
-					const found = originalKeywords.find((k) => bodyNormalized.includes(normalize(k)));
+					// A plain word like "error" must match as a whole word — otherwise it also
+					// matches harmless fields like "errorCount": 0 or "hasError": false.
+					// A punctuation-containing pattern like "success":false is matched as a
+					// literal substring instead, since word boundaries don't apply to it.
+					const found = originalKeywords.find((k) => {
+						const normalizedK = normalize(k);
+						if (/^\w+$/.test(normalizedK)) {
+							return new RegExp(`\\b${normalizedK}\\b`).test(bodyNormalized);
+						}
+						return bodyNormalized.includes(normalizedK);
+					});
 					passed = !found;
 					reason = found
 						? `Response looked successful but contains a hidden failure indicator: "${found}"`
