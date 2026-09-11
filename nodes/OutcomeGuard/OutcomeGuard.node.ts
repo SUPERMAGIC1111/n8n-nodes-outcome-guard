@@ -199,12 +199,12 @@ export class OutcomeGuard implements INodeType {
 					const body = this.getNodeParameter('responseBody', i) as string;
 					const keywordsRaw = this.getNodeParameter('errorKeywords', i) as string;
 					const normalize = (s: string) => s.toLowerCase().replace(/\s+/g, '');
-					const keywords = keywordsRaw
-						.split(',')
-						.map((k) => normalize(k.trim()))
-						.filter(Boolean);
 					const bodyNormalized = normalize(body);
-					const found = keywords.find((k) => bodyNormalized.includes(k));
+					const originalKeywords = keywordsRaw
+						.split(',')
+						.map((k) => k.trim())
+						.filter(Boolean);
+					const found = originalKeywords.find((k) => bodyNormalized.includes(normalize(k)));
 					passed = !found;
 					reason = found
 						? `Response looked successful but contains a hidden failure indicator: "${found}"`

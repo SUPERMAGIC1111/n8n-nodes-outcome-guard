@@ -23,6 +23,36 @@ Drop **Outcome Guard** in after any step you don't fully trust. Tell it what "ac
 
 When a check fails, Outcome Guard throws a real n8n error — which means it plugs straight into your existing Error Workflow / Slack / PagerDuty alerting. No new dashboard to learn.
 
+## Examples
+
+**1. A payment API that hides failures inside a 200 response**
+
+Your HTTP Request node calls a billing API. It returns HTTP 200 no matter what — success or failure is only visible inside the JSON body.
+
+- Check Type: `Response Has Hidden Error`
+- Response Body (Expression): `={{ JSON.stringify($json) }}`
+- Error Keywords: `error,failed,"success":false,"declined":true`
+
+Now a "successful" HTTP call with a declined payment throws a real n8n error instead of quietly continuing.
+
+**2. Confirming a CRM record actually got created**
+
+Your workflow calls an API to create a contact, but that API is known to occasionally accept the request and silently drop it.
+
+- Check Type: `Re-Fetch URL and Check Field`
+- Verification URL: `={{ "https://api.example.com/contacts/" + $json.id }}`
+- Expected Field Path: `status`
+- Expected Field Value: `active`
+
+Outcome Guard makes an independent follow-up call — if the contact isn't really there, it throws before your workflow moves on as if it worked.
+
+**3. A required field that sometimes comes back empty**
+
+A data transform step is supposed to always produce a `customerEmail` field, but occasionally doesn't.
+
+- Check Type: `Field Exists / Not Empty`
+- Field (Expression): `={{ $json.customerEmail }}`
+
 ## Status
 
 Working prototype: compiles clean, passes n8n's own community-node linter, 5/5 test scenarios pass, and verified live against a running n8n instance. Not yet submitted to the official n8n community node registry — see "Try it right now" below for testing before that.
