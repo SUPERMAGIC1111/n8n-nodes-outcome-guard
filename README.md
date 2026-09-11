@@ -56,17 +56,15 @@ A data transform step is supposed to always produce a `customerEmail` field, but
 
 ## Status
 
-Working prototype: compiles clean, passes n8n's own community-node linter, 5/5 test scenarios pass, and verified live against a running n8n instance. Not yet submitted to the official n8n community node registry — see "Try it right now" below for testing before that.
+**Published on npm:** https://www.npmjs.com/package/n8n-nodes-outcome-guard
 
-## Try it right now (no GitHub or npm account needed)
-
-If someone sent you a `n8n-nodes-outcome-guard-0.1.0.tgz` file, you can try this node in your own n8n today:
+## Install it
 
 ```bash
 mkdir -p ~/.n8n/custom
 cd ~/.n8n/custom
 npm init -y          # skip if this file already exists
-npm install /path/to/n8n-nodes-outcome-guard-0.1.0.tgz
+npm install n8n-nodes-outcome-guard
 ```
 
 Restart n8n. Search for **"Outcome Guard"** when adding a node — it'll be there.

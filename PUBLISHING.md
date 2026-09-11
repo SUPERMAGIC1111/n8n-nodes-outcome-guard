@@ -1,22 +1,14 @@
 # Publishing checklist
 
-Everything code-side is done and verified (see CHANGELOG.md). What's left needs your own npm account — I can't log in on your behalf, so these are the exact steps for whenever you're ready.
-
 ## 1. GitHub repo — done ✅
 
 Live at https://github.com/SUPERMAGIC1111/n8n-nodes-outcome-guard — full history, MIT license detected, `package.json` updated with the real URL. Pushed via a dedicated SSH deploy key (`outcome-guard-deploy` in your GitHub SSH keys settings) so future pushes need no password/token at all.
 
-## 2. Create an npm account (if you don't have one)
+## 2. npm account — done ✅
 
-npmjs.com → Sign Up. Free.
+## 3. Published to npm — done ✅
 
-## 3. Publish to npm
-
-```bash
-cd ~/Documents/AIAIAI-----AI/n8n-outcome-guard
-npm login          # follow the prompts — this is interactive, I can't do it for you
-npm publish
-```
+**Live at https://www.npmjs.com/package/n8n-nodes-outcome-guard** — `n8n-nodes-outcome-guard@0.2.0`, published 2026-09-11. Anyone running n8n can now install it with `npm install n8n-nodes-outcome-guard` in their `~/.n8n/custom` folder, no `.tgz` file needed anymore.
 
 ## 4. Submit for n8n community node verification (optional but recommended)
 
