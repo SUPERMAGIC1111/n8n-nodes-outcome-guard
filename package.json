@@ -1,0 +1,45 @@
+{
+  "name": "n8n-nodes-outcome-guard",
+  "version": "0.1.0",
+  "description": "Catch silent failures in n8n workflows — verify what actually happened, not just whether an error was thrown",
+  "keywords": [
+    "n8n-community-node-package"
+  ],
+  "license": "MIT",
+  "homepage": "",
+  "author": {
+    "name": ""
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc && node -e \"require('fs').cpSync('nodes','dist/nodes',{recursive:true,filter:(s)=>!s.endsWith('.ts')})\"",
+    "dev": "tsc --watch",
+    "lint": "eslint nodes --ext .ts",
+    "lintfix": "eslint nodes --ext .ts --fix",
+    "test": "npm run build && node test/manual.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "n8n": {
+    "n8nNodesApiVersion": 1,
+    "nodes": [
+      "dist/nodes/OutcomeGuard/OutcomeGuard.node.js"
+    ]
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-n8n-nodes-base": "^1.16.0",
+    "n8n-workflow": "^1.60.0",
+    "typescript": "^5.4.0"
+  },
+  "peerDependencies": {
+    "n8n-workflow": "*"
+  }
+}
