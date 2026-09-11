@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-outcome-guard",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Catch silent failures in n8n workflows — verify what actually happened, not just whether an error was thrown",
   "keywords": [
     "n8n-community-node-package"
